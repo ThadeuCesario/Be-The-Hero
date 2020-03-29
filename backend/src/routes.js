@@ -1,4 +1,5 @@
 const express = require('express');
+const {celebrate, Segments, Joi} = require('celebrate');
 const OngController = require('./controllers/OngController');
 const connection = require('./database/connection'); //Importamos a configuração, assim podemos realizar a comunicação com o banco de dados
 const IncidentController = require('./controllers/IncidentController');
@@ -20,7 +21,15 @@ routes.get('/ongs', OngController.index);
  
 // });
 
-routes.post('/ongs', OngController.create);
+routes.post('/ongs', celebrate({
+  [Segments.BODY]: Joi.object().keys({
+      name: Joi.string().required(), //Verifica se o nome é uma string e é obrigatório.
+      email: Joi.string().required().email(),  //Verifica se o email é uma string, se está preenchido e no formato de email mesmo.
+      whatsapp: Joi.string().required().min(10).max(11), //Verifica se é um numero, se está preenchido, e se possúi pelo menos 10 caractéres e no máximo 11 caractéres.
+      city: Joi.string().required(), // Verifica se é uma string e se está preenchido.
+      uf: Joi.string().required().length(2) //Verifica se é uma string, se está preenchido e se possúi o tamanho de dois caractéres.
+    })   
+}), OngController.create);
 
 /**
  * Rota para cadastro dos incidentes
@@ -30,20 +39,32 @@ routes.post('/incidents', IncidentController.create);
 /**
  * Rota para listagem dos incidentes
  */
-routes.get('/incidents', IncidentController.index);
+routes.get('/incidents', celebrate({
+    [Segments.QUERY]: Joi.object().keys({
+        page: Joi.number()
+    })
+}) ,IncidentController.index);
 
 /**
  * Rota para deletar incidentes.
  * Como para remover um incidente é algo especifico, estamos passando um route param, 
  * com o id do incidente para prosseguirmos.
  */
-routes.delete('/incidents/:id', IncidentController.delete);
+routes.delete('/incidents/:id', celebrate({
+    [Segments.PARAMS]: Joi.object().keys({
+        id: Joi.number().required() //Nos parametros da request, deve haver um key que seja number e que esteja preenchido.
+    })
+}), IncidentController.delete);
 
 
 /**
  * Rota para listar incidentes especificos
  */
-routes.get('/profile', ProfileController.index);
+routes.get('/profile', celebrate({
+    [Segments.HEADERS]: Joi.object({
+        authorization: Joi.string().required() //Nesse caso será verificado se no header de nossa request, possui uma key chamada 'authorization'. Sendo que essa key deve ser required e no formato de string.
+    }).unknown(),
+}), ProfileController.index);
 
 /**
  * Rota de login, que verificará se a ONG existe ou não.

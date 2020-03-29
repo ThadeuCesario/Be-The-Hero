@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const routes = require('./routes');
+const {errors} = require('celebrate');
 
 const app = express();
 
@@ -13,6 +14,8 @@ app.use(routes);
 /**
  *  Rota / Recurso
  */
+
+app.use(errors());
 
 /**
  * Métodos HTTP:
@@ -51,4 +54,6 @@ app.use(routes);
     
 
 
-app.listen(3333)
+// app.listen(3333);
+
+module.exports = app;

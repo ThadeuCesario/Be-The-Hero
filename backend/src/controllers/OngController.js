@@ -2,7 +2,7 @@
  * Como precisará de conexão com o banco, colocamos essa conexão no começo do arquivo.
  */
 const connection = require('../database/connection'); //Importamos a configuração, assim podemos realizar a comunicação com o banco de dados
-const crypto = require('crypto'); //Podemos gerar um método de crypto para gerar um hash
+const generateUniqueId = require('../utils/generateUniqueId'); //Podemos gerar um método de crypto para gerar um hash
 
 module.exports = {
 
@@ -30,7 +30,7 @@ module.exports = {
         /**
          * Abaixo, utilizando o crypto. Estamos gerando um id de 4 bytes com caracteres hexadecimal.
          */
-        const id = crypto.randomBytes(4).toString('HEX');
+        const id = generateUniqueId();
 
         // console.log(paramsQuery);
         // console.log(paramsRoute);
